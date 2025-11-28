@@ -1,0 +1,110 @@
+local MaxSpeed = 350
+
+local LocalPlayer = game:GetService("Players").LocalPlayer
+local Locations = workspace._WorldOrigin.Locations
+
+local function getCharacter()
+    if not LocalPlayer.Character then
+        LocalPlayer.CharacterAdded:Wait()
+    end
+    LocalPlayer.Character:WaitForChild("HumanoidRootPart")
+    return LocalPlayer.Character
+end
+
+local function DistanceFromPlrSort(ObjectList: table)
+    local RootPart = getCharacter().LowerTorso
+    table.sort(ObjectList, function(ChestA, ChestB)
+        local RootPos = RootPart.Position
+        local DistanceA = (RootPos - ChestA.Position).Magnitude
+        local DistanceB = (RootPos - ChestB.Position).Magnitude
+        return DistanceA < DistanceB
+    end)
+end
+
+local UncheckedChests = {}
+local FirstRun = true
+
+local function getChestsSorted()
+    if FirstRun then
+        FirstRun = false
+        local Objects = game:GetDescendants()
+        for i, Object in pairs(Objects) do
+            if Object.Name:find("Chest") and Object.ClassName == "Part" then
+                table.insert(UncheckedChests, Object)
+            end
+        end
+    end
+    local Chests = {}
+    for i, Chest in pairs(UncheckedChests) do
+        if Chest:FindFirstChild("TouchInterest") then
+            table.insert(Chests, Chest)
+        end
+    end
+    DistanceFromPlrSort(Chests)
+    return Chests
+end
+
+local function toggleNoclip(Toggle: boolean)
+    for i,v in pairs(getCharacter():GetChildren()) do
+        if v.ClassName == "Part" then
+            v.CanCollide = not Toggle
+        end
+    end
+end
+
+local function Teleport(Goal: CFrame, Speed)
+    if not Speed then
+        Speed = MaxSpeed
+    end
+    toggleNoclip(true)
+    local RootPart = getCharacter().HumanoidRootPart
+    local Magnitude = (RootPart.Position - Goal.Position).Magnitude
+
+    RootPart.CFrame = RootPart.CFrame
+    
+    while not (Magnitude < 1) do
+        local Direction = (Goal.Position - RootPart.Position).unit
+        RootPart.CFrame = RootPart.CFrame + Direction * (Speed * wait())
+        Magnitude = (RootPart.Position - Goal.Position).Magnitude
+    end
+    toggleNoclip(false)
+end
+
+local function ServerHop()
+    local HttpService = game:GetService("HttpService")
+    local PlaceId = game.PlaceId
+    local Servers = {}
+
+    local success, result = pcall(function()
+        return HttpService:JSONDecode(
+            game:HttpGet("https://games.roblox.com/v1/games/" .. PlaceId .. "/servers/Public?sortOrder=Asc&limit=100")
+        )
+    end)
+
+    if not success then return end
+
+    for _, server in pairs(result.data) do
+        if server.playing < server.maxPlayers and server.id ~= game.JobId then
+            table.insert(Servers, server.id)
+        end
+    end
+
+    if #Servers > 0 then
+        local RandomServer = Servers[math.random(1, #Servers)]
+        game:GetService("TeleportService"):TeleportToPlaceInstance(PlaceId, RandomServer)
+    end
+end
+
+local function main()
+    while wait() do
+        local Chests = getChestsSorted()
+        if #Chests > 0 then
+            Teleport(Chests[1].CFrame)
+        else
+            ServerHop()
+        end
+    end
+end
+
+wait = task.wait
+main()
