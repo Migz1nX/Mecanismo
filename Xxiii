@@ -1,0 +1,213 @@
+local Config = getgenv().Config or {}
+local MaxSpeed = Config.MaxSpeed or 350
+local TargetTeam = Config.Team or "Pirates"
+local AutoToggleTeam = Config.AutoToggleTeam or true
+
+getgenv().CollectedMoney = getgenv().CollectedMoney or 0
+
+local Players = game:GetService("Players")
+local HttpService = game:GetService("HttpService")
+local TeleportService = game:GetService("TeleportService")
+local LocalPlayer = Players.LocalPlayer
+
+local wait = task.wait
+
+local MoneyLabel = nil
+local MoneyValue = nil
+
+local function initMoneyValue()
+    MoneyValue = workspace:FindFirstChild("CollectedMoney") or Instance.new("IntValue", workspace)
+    MoneyValue.Name = "CollectedMoney"
+    MoneyValue.Value = getgenv().CollectedMoney
+end
+
+local function getCurrentBeli()
+    local leaderstats = LocalPlayer:FindFirstChild("leaderstats")
+    if leaderstats and leaderstats:FindFirstChild("Beli") then
+        return leaderstats.Beli.Value
+    end
+    return 0 
+end
+
+local function updateMoneyLabel(amount)
+    if MoneyLabel then
+        local formattedAmount = string.format("%,d", amount)
+        MoneyLabel.Text = "Money Collected: " .. formattedAmount
+    end
+    if MoneyValue then
+        MoneyValue.Value = amount
+    end
+end
+
+local function createGUI()
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "ChestHubV5_GUI"
+    ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+    ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+    local BackFrame = Instance.new("Frame")
+    BackFrame.Name = "Background"
+    BackFrame.Size = UDim2.new(1, 0, 1, 0)
+    BackFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    BackFrame.BackgroundTransparency = 0.5
+    BackFrame.Parent = ScreenGui
+    
+    local TitleLabel = Instance.new("TextLabel")
+    TitleLabel.Name = "Title"
+    TitleLabel.Size = UDim2.new(0.8, 0, 0.15, 0)
+    TitleLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+    TitleLabel.Position = UDim2.new(0.5, 0, 0.2, 0)
+    TitleLabel.BackgroundTransparency = 1
+    TitleLabel.Font = Enum.Font.GothamBold
+    TitleLabel.TextSize = 72
+    TitleLabel.TextColor3 = Color3.fromRGB(255, 102, 255)
+    TitleLabel.Text = "Chest hub V5"
+    TitleLabel.TextXAlignment = Enum.TextXAlignment.Center
+    TitleLabel.Parent = BackFrame
+
+    MoneyLabel = Instance.new("TextLabel")
+    MoneyLabel.Name = "MoneyCounter"
+    MoneyLabel.Size = UDim2.new(0.8, 0, 0.1, 0)
+    MoneyLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+    MoneyLabel.Position = UDim2.new(0.5, 0, 0.35, 0)
+    MoneyLabel.BackgroundTransparency = 1
+    MoneyLabel.Font = Enum.Font.Gotham
+    MoneyLabel.TextSize = 40
+    MoneyLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
+    MoneyLabel.Text = "Money Collected: Dinheiro aqui"
+    MoneyLabel.TextXAlignment = Enum.TextXAlignment.Center
+    MoneyLabel.Parent = BackFrame
+    
+    updateMoneyLabel(getgenv().CollectedMoney)
+end
+
+local function getCharacter()
+    local character = LocalPlayer.Character
+    if not character or not character:FindFirstChild("HumanoidRootPart") then
+        character = LocalPlayer.CharacterAdded:Wait()
+    end
+    return character:WaitForChild("HumanoidRootPart", 5)
+end
+
+local function DistanceFromPlrSort(ObjectList)
+    local RootPart = getCharacter()
+    local RootPos = RootPart.Position
+    table.sort(ObjectList, function(ChestA, ChestB)
+        local DistanceA = (RootPos - ChestA.Position).Magnitude
+        local DistanceB = (RootPos - ChestB.Position).Magnitude
+        return DistanceA < DistanceB
+    end)
+end
+
+local UncheckedChests = {}
+local FirstRun = true
+
+local function populateChests()
+    for _, Object in ipairs(workspace:GetDescendants()) do
+        if Object.Name:match("Chest") and Object:IsA("Part") then
+            table.insert(UncheckedChests, Object)
+        end
+    end
+end
+
+local function getChestsSorted()
+    if FirstRun then
+        FirstRun = false
+        populateChests()
+    end
+    local ActiveChests = {}
+    for _, Chest in ipairs(UncheckedChests) do
+        if Chest:FindFirstChild("TouchInterest") then
+            table.insert(ActiveChests, Chest)
+        end
+    end
+    DistanceFromPlrSort(ActiveChests)
+    return ActiveChests
+end
+
+local function toggleNoclip(Toggle)
+    local Character = LocalPlayer.Character
+    if not Character then return end
+    for _, Part in ipairs(Character:GetChildren()) do
+        if Part:IsA("Part") then
+            Part.CanCollide = not Toggle
+        end
+    end
+end
+
+local function Teleport(Goal, Speed)
+    local CurrentSpeed = Speed or MaxSpeed 
+    local RootPart = getCharacter()
+    toggleNoclip(true)
+    local Magnitude = (RootPart.Position - Goal.Position).Magnitude
+    while Magnitude > 1.5 do
+        local dt = wait()
+        local Direction = (Goal.Position - RootPart.Position).Unit
+        RootPart.CFrame = RootPart.CFrame + Direction * (CurrentSpeed * dt)
+        Magnitude = (RootPart.Position - Goal.Position).Magnitude
+    end
+    RootPart.CFrame = Goal
+    toggleNoclip(false)
+end
+
+local function ServerHop()
+    local PlaceId = game.PlaceId
+    local Servers = {}
+    local success, result = pcall(function()
+        local url = "https://games.roblox.com/v1/games/" .. PlaceId .. "/servers/Public?sortOrder=Asc&limit=100"
+        return HttpService:JSONDecode(game:HttpGet(url))
+    end)
+    if not success or not result.data then return end
+    for _, server in ipairs(result.data) do
+        if server.playing < server.maxPlayers and server.id ~= game.JobId then
+            table.insert(Servers, server.id)
+        end
+    end
+    if #Servers > 0 then
+        local RandomServer = Servers[math.random(1, #Servers)]
+        TeleportService:TeleportToPlaceInstance(PlaceId, RandomServer, LocalPlayer)
+    end
+end
+
+local function setPlayerTeam()
+    if not AutoToggleTeam then return end
+    local teamFolder = game:GetService("Teams")
+    local desiredTeam = teamFolder:FindFirstChild(TargetTeam)
+    if desiredTeam and LocalPlayer.Team ~= desiredTeam then
+        LocalPlayer.Team = desiredTeam
+        LocalPlayer.TeamColor = desiredTeam.TeamColor
+        local Char = LocalPlayer.Character
+        if Char and Char:FindFirstChild("Humanoid") then
+            Char.Humanoid.Health = 0
+        end
+    elseif not desiredTeam then
+        warn("O time '" .. TargetTeam .. "' não foi encontrado. Verifique a ortografia (Pirates/Marines).")
+    end
+end
+
+local function main()
+    initMoneyValue()
+    createGUI()
+    setPlayerTeam()
+    getCharacter()
+    while true do
+        wait(0.1)
+        local Chests = getChestsSorted()
+        if #Chests > 0 then
+            local oldBeli = getCurrentBeli()
+            local TargetChest = Chests[1]
+            Teleport(TargetChest.CFrame)
+            wait(0.5)
+            local newBeli = getCurrentBeli()
+            local moneyGained = newBeli - oldBeli
+            if moneyGained > 0 then 
+                getgenv().CollectedMoney = getgenv().CollectedMoney + moneyGained
+                updateMoneyLabel(getgenv().CollectedMoney)
+            end
+        else
+            ServerHop()
+        end
+    end
+end
+
+main()
