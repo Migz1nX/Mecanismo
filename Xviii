@@ -1,0 +1,4 @@
+_G.Team = "Pirate" -- "Marine" ou "Pirate"
+_G.MetodeTeleport = "Tween" --"Instant" ou "Tween"
+_G.Treasure = False -- true ou false (true para o farm caso pegue algum item como god calice ou fod)
+loadstring(game:HttpGet("https://raw.githubusercontent.com/ThundarZ/Welcome/refs/heads/main/Main/BloxFruit/Chest/AllDevices.lua"))()
