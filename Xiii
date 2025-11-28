@@ -1,0 +1,60 @@
+# Lista De Scripts
+`` @stormzn Scripts``
+
+### * AnDepZai Hub
+
+`loadstring(game:HttpGet("https://raw.githubusercontent.com/AnDepZaiHub/AnDepZaiHubBeta/main/AnDepZaiHubBeta.lua"))()`
+
+### * Cokka Hub 
+
+`loadstring(game:HttpGet"https://raw.githubusercontent.com/UserDevEthical/Loadstring/main/CokkaHub.lua")()`
+
+### * MinGaming Hub
+
+`loadstring(game:HttpGet"https://raw.githubusercontent.com/Basicallyy/Basicallyy/main/MinGamingV4.lua")()`
+
+### * Hoho Hub
+
+`loadstring(game:HttpGet("https://raw.githubusercontent.com/acsu123/HOHO_H/main/Loading_UI"))()`
+
+* Hoho Bounty Generator
+
+https://hehehub-acsu123.pythonanywhere.com/api/config_auto_bounty
+
+### * Tsuo Hub
+
+`loadstring(game:HttpGet("https://raw.githubusercontent.com/Tsuo7/TsuoHub/main/Tsuoscripts"))()`
+
+### * Matsune Hub
+
+`loadstring(game:HttpGet("https://raw.githubusercontent.com/Yatsuraa/Matsune/main/matsunehubv1.lua"))()`
+
+### * Speed Hub
+
+`loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()`
+
+### * Auto Chest
+
+`_G.JoinTeam = "Marines" --/
+_G.Stop_If_Has_Items = true --// fasle
+loadstring(game:HttpGet("https://github.com/PNguyen0199/Script/raw/main/Trash_Auto_Chest.lua"))()`
+
+### * Auto Chest 2
+
+`loadstring(game:HttpGet("https://raw.githubusercontent.com/ThunderZ-05/HUB/main/Main/Chest/AllDevice.lua"))()`
+
+* Config
+
+`-- Config
+_G.Team = "Marine" -- "Marine" or "Pirate"
+_G.MetodeTeleport = "Instant" --"Instant" or "Tween"
+_G.Treasure = true -- true or false (true means you will auto stop when get Chalice & Fod) 
+loadstring(game:HttpGet("https://raw.githubusercontent.com/ThundarZ/Welcome/refs/heads/main/Main/BloxFruit/Chest/AllDevices.lua"))()`
+
+### * Auto Chest 3 (Open Source) 
+
+`loadstring(game:HttpGet("https://isnahamzahpastebin.tech/chest/new"))()`
+
+### * Mama Hub
+
+`loadstring(game:HttpGet("https://raw.githubusercontent.com/MAMAhub1/Mmahub/main/README.md"))()`
